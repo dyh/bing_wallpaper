@@ -42,40 +42,42 @@ def get_resource_path():
 
 if __name__ == "__main__":
 
-    # 获取程序运行绝对路径
-    current_path = get_resource_path()
-
-    # 拼接图片绝对路径
-    local_img_file_path = os.path.join(current_path, 'background.jpg')
-
-    # bing api
-    bing_api_url = 'https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&'
-
-    response = requests.get(bing_api_url)
-    # bytes -> string
-    json_text = response.content.decode('utf-8')
-    # string -> list[]
-    list_json = json.loads(json_text)
-    # 获取图片文件名称 urlbase
-    # "urlbase": "/th?id=OHR.SestriLevante_ZH-CN9286254645"
-    img_path = list_json['images'][0]['urlbase']
-
-    # 拼接图片完整 url
-    # https://www.bing.com/th?id=OHR.SestriLevante_ZH-CN9286254645_UHD.jpg
-    img_url = 'https://www.bing.com' + img_path + '_UHD.jpg'
-    response = requests.get(img_url)
-
-    img_data = response.content
-
     try:
+
+        # 获取程序运行绝对路径
+        current_path = get_resource_path()
+
+        # 拼接图片绝对路径
+        local_img_file_path = os.path.join(current_path, 'background.jpg')
+
+        # bing api
+        bing_api_url = 'https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&'
+
+        response = requests.get(bing_api_url)
+        # bytes -> string
+        json_text = response.content.decode('utf-8')
+
+        # string -> list[]
+        list_json = json.loads(json_text)
+
+        # 获取图片文件名称 urlbase
+        # "urlbase": "/th?id=OHR.SestriLevante_ZH-CN9286254645"
+        img_path = list_json['images'][0]['urlbase']
+
+        # 拼接图片完整 url
+        # https://www.bing.com/th?id=OHR.SestriLevante_ZH-CN9286254645_UHD.jpg
+        img_url = 'https://www.bing.com' + img_path + '_UHD.jpg'
+        response = requests.get(img_url)
+
+        img_data = response.content
+
         # 保存图片到本地
         with open(local_img_file_path, 'wb') as img:
             img.write(img_data)
-            print('save img to', local_img_file_path)
 
         system = get_os()
 
-        notify = 'notify-send "done"'
+        notify = f'notify-send "done"'
 
         if system == 'ubuntu':
             # 亮色主题
@@ -109,6 +111,9 @@ if __name__ == "__main__":
 
         os.system(notify)
 
+        print('img saved to', local_img_file_path)
+
     except Exception as e:
         notify = 'notify-send "{}"'.format(str(e))
         os.system(notify)
+        print(notify)
