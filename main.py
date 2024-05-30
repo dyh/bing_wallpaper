@@ -2,6 +2,8 @@ import ctypes
 import os
 import json
 import platform
+import sys
+
 import requests
 
 
@@ -28,10 +30,21 @@ def get_os():
     pass
 
 
+def get_resource_path():
+    if getattr(sys, 'frozen', False):  # 是否为PyInstaller打包的exe文件
+        # 返回exe文件所在的绝对路径
+        base_path = os.path.dirname(sys.executable)
+    else:  # 在开发环境下运行
+        # 返回脚本文件所在的绝对路径
+        base_path = os.path.dirname(__file__)
+    return base_path
+
+
 if __name__ == "__main__":
 
     # 获取程序运行绝对路径
-    current_path = os.path.dirname(os.path.abspath(__file__))
+    current_path = get_resource_path()
+
     # 拼接图片绝对路径
     local_img_file_path = os.path.join(current_path, 'background.jpg')
 
@@ -58,6 +71,7 @@ if __name__ == "__main__":
         # 保存图片到本地
         with open(local_img_file_path, 'wb') as img:
             img.write(img_data)
+            print('save img to', local_img_file_path)
 
         system = get_os()
 
